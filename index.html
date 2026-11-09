@@ -322,25 +322,29 @@
             dot.style.backgroundColor = isSyncing ? '#eab308' : '#22c55e';
         }
 
-        async function sincronizarDesdeDrive() {
-            setSyncStatus(true);
-            mostrarNotificacion('Descargando datos de Drive...');
-            try {
-                const res = await fetch(SCRIPT_URL + "?action=obtener");
-                const datos = await res.json();
-                if (datos && typeof datos === 'object') {
-                    db = datos;
-                    localStorage.setItem('go_beta2_data', JSON.stringify(db));
-                    renderizarTodo();
-                    mostrarNotificacion('Conectado y actualizado con Drive');
-                }
-            } catch (err) {
-                console.warn("Trabajando con copia local:", err);
-                mostrarNotificacion('Modo offline: usando datos locales');
-            } finally {
-                setSyncStatus(false);
-            }
+       async function sincronizarDesdeDrive() {
+    setSyncStatus(true);
+    mostrarNotificacion('Descargando datos de Drive...');
+    try {
+        const res = await fetch(SCRIPT_URL + "?action=obtener&t=" + Date.now(), {
+            method: 'GET',
+            redirect: 'follow',
+            cache: 'no-store'
+        });
+        const datos = await res.json();
+        if (datos && typeof datos === 'object') {
+            db = datos;
+            localStorage.setItem('go_beta2_data', JSON.stringify(db));
+            renderizarTodo();
+            mostrarNotificacion('Conectado y actualizado con Drive');
         }
+    } catch (err) {
+        console.warn("Trabajando con copia local:", err);
+        mostrarNotificacion('Modo offline: usando datos locales');
+    } finally {
+        setSyncStatus(false);
+    }
+}
 
         async function guardarBD() {
             setSyncStatus(true);
