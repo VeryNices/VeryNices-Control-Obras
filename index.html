@@ -326,11 +326,19 @@
     setSyncStatus(true);
     mostrarNotificacion('Descargando datos de Drive...');
     try {
-        const res = await fetch(SCRIPT_URL + "?action=obtener&t=" + Date.now(), {
+        const url = SCRIPT_URL + "?action=obtener&t=" + new Date().getTime();
+        const res = await fetch(url, {
             method: 'GET',
+            mode: 'cors',
+            credentials: 'omit',
             redirect: 'follow',
-            cache: 'no-store'
+            headers: {
+                'Accept': 'application/json'
+            }
         });
+        
+        if (!res.ok) throw new Error("HTTP status " + res.status);
+        
         const datos = await res.json();
         if (datos && typeof datos === 'object') {
             db = datos;
